@@ -56,9 +56,7 @@ class Initializer {
         const btns = document.querySelector('.pagination-container').children;
         const self = this;
 
-        [].forEach.call(btns, btn => {
-            btn.addEventListener('click', onClick);
-        });
+        [].forEach.call(btns, btn => btn.addEventListener('click', onClick));
 
         function onClick(event) {
             document.querySelector('.active').classList.remove('active');
@@ -70,7 +68,9 @@ class Initializer {
             self._pageCreator.createPage(videos.slice(start, end));
         }
         
-        btns[0].classList.add('active');
+        if(btns[0]) {
+            btns[0].classList.add('active');
+        }
     }
 
     initFilter() {
@@ -111,15 +111,12 @@ class Initializer {
             document.querySelector('.filter').value = '';
             document.querySelector('#sorter').value = 'none';
 
-            const toSearch = document.querySelector('.search-string').value.replace(/%20/g, "+"); 
+            const toSearch = encodeURIComponent(document.querySelector('.search-string').value);
             const request = `https://www.googleapis.com/youtube/v3/search?part=snippet` 
                     + `&key=${this.key}&q=${toSearch}&type=video&maxResults=${this.maxResults}`;
 
             fetch(request)
-              .then(response => {
-                      return response.json();
-                  }
-              )
+              .then(response => response.json())
               .then(data => {
                       this.videos = [];
                       for(let item of data.items) {
